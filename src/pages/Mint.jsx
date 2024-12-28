@@ -14,6 +14,7 @@ const Mint = () => {
   const handleClick = e => {
     e.preventDefault()
     console.log(file);
+    // Add logic to handle file upload and minting
   }
 
   const handleInputChange = (e) => {

@@ -1,9 +1,48 @@
-import React from 'react'
-
-import Footer from '../components/Footer'
-import realestate from "../data/realestate.json"
+import React from 'react';
+import * as fcl from "@onflow/fcl";
+import Footer from '../components/Footer';
+import realestate from "../data/realestate.json";
 
 const Buy = () => {
+  const handleBuy = async (estate) => {
+    try {
+      const transactionId = await fcl.mutate({
+        cadence: `
+          import NFTStorefrontV2 from 0x2d55b98eb200daef
+          import NonFungibleToken from 0x631e88ae7f1d7c20
+          import FungibleToken from 0x9a0766d93b6608b7
+
+          transaction(listingResourceID: UInt64) {
+            let storefront: &NFTStorefrontV2.Storefront{NFTStorefrontV2.StorefrontPublic}
+            let paymentVault: @FungibleToken.Vault
+
+            prepare(acct: AuthAccount) {
+              self.storefront = acct.borrow<&NFTStorefrontV2.Storefront{NFTStorefrontV2.StorefrontPublic}>(from: /storage/NFTStorefrontV2)
+                ?? panic("Could not borrow reference to the storefront")
+              self.paymentVault <- acct.borrow<&FungibleToken.Vault>(from: /storage/flowTokenVault)!.withdraw(amount: 10.0)
+            }
+
+            execute {
+              let listing = self.storefront.borrowListing(listingResourceID: listingResourceID)
+                ?? panic("Could not borrow listing")
+              listing.purchase(payment: <-self.paymentVault, commissionRecipient: nil)
+            }
+          }
+        `,
+        args: (arg, t) => [
+          arg(estate.listingResourceID, t.UInt64)
+        ],
+        proposer: fcl.currentUser().authorization,
+        payer: fcl.currentUser().authorization,
+        authorizations: [fcl.currentUser().authorization],
+        limit: 100
+      });
+      console.log("Transaction ID:", transactionId);
+    } catch (error) {
+      console.error("Error purchasing property:", error);
+    }
+  };
+
   return (
     <>
       <div className='w-full mt-14 flex items-center justify-center'>
@@ -29,7 +68,12 @@ const Buy = () => {
                     </div>
                     <div className='w-11/12 flex items-center justify-center gap-x-2'>
                       <div className='flex items-center justify-center w-4/12 h-10 rounded-lg border'>{estate.property_price}</div>
-                      <button className='flex items-center justify-center w-8/12 h-10 rounded-lg bg-blue-700 text-white border'>Buy</button>
+                      <button
+                        className='flex items-center justify-center w-8/12 h-10 rounded-lg bg-blue-700 text-white border'
+                        onClick={() => handleBuy(estate)}
+                      >
+                        Buy
+                      </button>
                     </div>
                   </div>
                 )
@@ -40,7 +84,7 @@ const Buy = () => {
       </div>
       <Footer classes={""} />
     </>
-  )
-}
+  );
+};
 
-export default Buy
+export default Buy;

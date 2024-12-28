@@ -199,4 +199,3 @@ pub contract interface NonFungibleToken {
         }
     }
 }
- 

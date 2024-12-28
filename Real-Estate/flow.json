@@ -83,12 +83,17 @@
 		"emulator-account": {
 			"address": "f8d6e0586b0a20c7",
 			"key": "6d12eebfef9866c9b6fa92b97c6e705c26a1785b1e7944da701fc545a51d4673"
+		},
+		"ghovv": {
+			"address": "179b6b1cb6755e31",
+			"key": "52595b11a39b53c911fd9b095ec6bc37c9df74ab17727a3e39bdc22d48d42011"
 		}
 	},
 	"deployments": {
 		"emulator": {
 			"emulator-account": [
-				"LandRegistry"
+				"LandRegistry",
+				"NFTStorefrontV2"
 			]
 		}
 	}

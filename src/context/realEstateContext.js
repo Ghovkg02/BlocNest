@@ -13,21 +13,22 @@ export const RealEstateProvider = ({ children }) => {
         price: "",
     });
 
-    fcl.config().put("accessNode.api", "https://access-testnet.onflow.org");
-    fcl.config().put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn");
+    useEffect(() => {
+        fcl.config()
+            .put("accessNode.api", "https://access-testnet.onflow.org")
+            .put("discovery.wallet", "https://fcl-discovery.onflow.org/testnet/authn");
+    }, []);
 
     const connectWallet = () => {
         return fcl.authenticate();
     }
 
-
-
     const handleConnectWallet = async (e) => {
         e.preventDefault();
         try {
             await connectWallet();
-            const account = (await fcl.currentUser().authorization()).account; 
-            setWalletAddress(account);
+            const user = await fcl.currentUser().snapshot();
+            setWalletAddress(user.addr);
             setWalletConnected(true);
         } catch (error) {
             console.error("Error connecting wallet:", error);

@@ -22,4 +22,3 @@ pub contract interface ViewResolver {
         return nil
     }
 }
- 
